@@ -13,8 +13,20 @@
 #include <set>
 #include <string>
 #include <unordered_set>
+#include <random>
+#include <sstream>
 
-std::string kYourName = "STUDENT TODO"; // Don't forget to change this!
+std::string kYourName = "Deyue Li"; // Don't forget to change this!
+
+std::string get_initial(const std::string& name) {
+  std::string ret;
+  std::stringstream ss(name);
+  std::string word;
+  while (ss >> word) {
+    ret += toupper(word[0]);
+  }
+  return ret;
+}
 
 /**
  * Takes in a file name and returns a set containing all of the applicant names as a set.
@@ -29,6 +41,23 @@ std::string kYourName = "STUDENT TODO"; // Don't forget to change this!
  */
 std::set<std::string> get_applicants(std::string filename) {
   // STUDENT TODO: Implement this function.
+  std::set<std::string> names;
+
+  std::ifstream ifile(filename);
+
+  if (!ifile.is_open()) {
+    std::cerr << "Fail to open file\n";
+    return {};
+  }
+
+  std::string name;
+  while (getline(ifile, name)) {
+    if (name != "") {
+      names.insert(name);
+    }
+  }
+
+  return names;
 }
 
 /**
@@ -41,6 +70,15 @@ std::set<std::string> get_applicants(std::string filename) {
  */
 std::queue<const std::string*> find_matches(std::string name, std::set<std::string>& students) {
   // STUDENT TODO: Implement this function.
+  std::queue<const std::string*> ret;
+  std::string my_initial = get_initial(kYourName);
+
+  for (const std::string& stu : students) {
+    if (get_initial(stu) == my_initial) {
+      ret.push(&stu);
+    }
+  }
+  return ret;
 }
 
 /**
@@ -55,6 +93,25 @@ std::queue<const std::string*> find_matches(std::string name, std::set<std::stri
  */
 std::string get_match(std::queue<const std::string*>& matches) {
   // STUDENT TODO: Implement this function.
+  if (matches.empty()) {
+    return "NO MATCHES FOUND.";
+  }
+
+  std::random_device r;
+  std::default_random_engine e(r());
+
+  std::uniform_int_distribution<> dis(0, matches.size()-1);
+
+  int random_id = dis(e);
+
+  std::string match;
+
+  for (int i = 0; i < random_id; i++) {
+    matches.pop();
+  }
+  const std::string* m = matches.front();
+  match = *m;
+  return match;
 }
 
 /* #### Please don't remove this line! #### */
